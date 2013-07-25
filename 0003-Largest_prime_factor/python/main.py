@@ -1,43 +1,49 @@
-import math
 
-max = 600851475143
-#max = 34
+def factorize(number):
+    """ Decompose a number into its prime factors.
 
-# Using the Sieve of Eratosthenes to find all of the primes less than or
-# equal to max number. Algorithm taken from Wikipedia.
+    Returns the list of prime factors for the given number.
 
-# 1. Create a list of consecutive integers from 2 to max (including max).
-#numbers = range(2,int(math.sqrt(max))+1)
-#numbers.append(max)
-numbers = range(2,max+1)
+    """
 
-# 2. Initially, let p equal 2, the first prime number.
-p = 2
-index = 0
+    primes = []
 
-while index < len(numbers):
-    # 3. Remove all numbers from the list that are multiples of p.
-    index = numbers.index(p)
-    for i in numbers[index + 1:]:
-        if i % p == 0:
-            numbers.remove(i)
+    # Shortcut to check for even numbers. This way the loop only needs to
+    # loop through odd numbers, so it can be twice as fast.
+    if number == 2:
+        primes.append(number)
+        return primes
 
-    # 3.5 Additionally check if p is a factor of max and remove it if
-    #     it isn't. If it gets removed, use the same index to get the
-    #     next p value, otherwise increment the index.
-    if max % p != 0:
-        numbers.remove(p)
-        if index < len(numbers):
-            p = numbers[index]
+    if number % 2 == 0:
+        primes.append(2)
+        primes.extend(factorize(number / 2))
+        return primes
+
+    divisor = 3
+
+    while ((divisor*divisor < number)
+            and (number % divisor != 0)):
+        divisor = divisor + 2
+
+    # If the divisor is greater than the square root of the number after
+    # going through the previous loop, it means that no factors were found
+    # and, therefore, that the number itself is prime. This will terminate
+    # the recursion.
+    if divisor * divisor > number:
+        primes.append(number)
+        return primes
     else:
-        # 4. Find the first number greater than p in the list that is
-        #    not deleted. Iterate until there are no more such numbers.
-        if index + 1 < len(numbers):
-            p = numbers[index + 1]
-        else:
-            break
+        # The divisor itself may not actually be prime. Factorize it.
+        primes.extend(factorize(divisor))
 
+        # Factorize the result of the division and add all of those
+        # factors to the list.
+        primes.extend(factorize(number / divisor))
 
-print max
-print numbers
-print numbers[len(numbers) - 1]
+    return primes
+
+factors = factorize(600851475143)
+
+print factors
+print max(factors)
+
